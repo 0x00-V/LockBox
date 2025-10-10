@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+ <title>Lockbox - Dashboard</title>
+</head>
+<body>
+  <header>
+    <img src="Lockbox.png" alt="Lockbox Logo">
+    <div class="nav-links">
+      <a href="/learn">Learn</a>
+      <a href="/practice">Practice</a>
+      <div class="user-menu">
+        <img src="template-icon.png" alt="User Icon" class="user-icon" onclick="toggleMenu()">
+        <ul class="dropdown" id="dropdownMenu">
+          <li><a href="/account_settings">Account Settings</a></li>
+          <li>
+            <form action="/logout" method="POST">
+              <button type="submit">Logout</button>
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <h1>Hey {{username}}!</h1>
+    <section>
+      <h2>My Learning</h2>
+      <div class="learning-list">
+          <div class="learning-item"><a href="/">Course: Python Basics</a></div>
+      </div>
+    </section>
+  </main>
+
+  </div>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById("dropdownMenu");
+      menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    }
+    document.addEventListener("click", (e) => {
+      const menu = document.getElementById("dropdownMenu");
+      if (!e.target.closest(".user-menu")) {
+        menu.style.display = "none";
+      }
+    });
+  </script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Courier New", monospace;
+    }
+    body {
+      background-color: #0d0d0d;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      background: #111;
+      border-bottom: 2px solid #1f1f1f;
+    }
+    header img {
+      height: 80px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+    }
+    .nav-links a {
+      color: #aaa;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 16px;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover {
+      color: #c40d0a;
+    }
+    .user-menu {
+      position: relative;
+    }
+    .user-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #444;
+      transition: border 0.3s;
+    }
+    .user-icon:hover {
+      border: 2px solid #c40d0a;
+    }
+    .dropdown {
+      position: absolute;
+      right: 0;
+      top: 50px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 6px;
+      display: none;
+      list-style: none;
+      padding: 10px 0;
+      min-width: 180px;
+      z-index: 100;
+    }
+    .dropdown li {
+      padding: 10px 20px;
+    }
+    .dropdown li a,
+    .dropdown li button {
+      color: #fff;
+      text-decoration: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      font-size: 14px;
+    }
+    .dropdown li a:hover,
+    .dropdown li button:hover {
+      background: #c40d0a;
+      color: #fff;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 40px;
+    }
+    main h1 {
+      font-size: 2.2rem;
+      margin-bottom: 30px;
+      color: #c40d0a;
+    }
+    section {
+      margin-bottom: 50px;
+    }
+    section h2 {
+      font-size: 1.6rem;
+      margin-bottom: 15px;
+      color: #fff;
+      border-left: 4px solid #c40d0a;
+      padding-left: 10px;
+    }
+    .learning-list {
+      display: grid;
+      gap: 20px;
+    }
+    .learning-item {
+      background: #111;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #222;
+      transition: border 0.3s;
+    }
+  </style>
+</body>
+</html>
+

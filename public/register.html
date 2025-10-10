@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+<head>
+    <title>LockBox - Register</title>
+</head>
+<body>
+  <div class="wrapper">
+      <img src="Lockbox.png" class="logo">
+    <div class="login-container">
+      <h1>REGISTER</h1>
+      <div class="input">
+        <form method="POST" action="/register">
+          <label for="username">USERNAME</label>
+          <input type="text" name="username" placeholder="enter a username"></input>
+          <label for="password">PASSWORD</label>
+          <input type="password" name="password" placeholder="***********"></input>
+          <button type="submit">REGISTER</button>
+        </form>
+      </div>
+    </div>
+    <div class="register">    
+      <h2>Already have an account? <a href="/login">Click here</a></h2>
+    </div>
+  </div>
+
+<style>
+  *{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Courier New", monospace;
+  }
+  body{
+      background-color: #000000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+  }
+  .wrapper{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+  }
+.login-container{
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #000;
+  padding: 40px 30px;
+  background-color: #000000;
+  box-shadow: 8px 8px 0 #000;
+  outline: 5px solid #fff;
+  outline-offset: 6px;
+  position: relative;
+  border-radius: 12px;
+} 
+.login-container::before{
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    right: -6px;
+    bottom: -6px;
+    border: 1px solid #000000;
+    z-index: -1;
+    border-radius: 12px;
+  }
+  h1{
+      color: #FFF;
+      margin-bottom: 30px;
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+  }
+  input{
+      margin-bottom: 20px;
+      position: relative;
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #000000;
+      background-color: #FFFFFF;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s;
+  }
+  label{
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #FFF;
+  }
+  input:focus{
+      box-shadow: 4px 4px 0px #000000;
+      border-radius: 5px;
+  }
+  button{
+      width: 100%;
+      padding: 12px;
+      color: #FFFFFF;
+      background-color: #c40d0a;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.3s;
+  }
+  button:hover{
+      box-shadow: 4px 4px 0 #000000;
+      transform: translate(-2px, -2px);
+  }
+  .register{
+      font-size: 13px;
+      color: #fff;
+      margin-top: 20px;
+      text-align: center;
+  }
+  .register a{
+      color: #00AAFF;
+      text-decoration: underline;
+  }
+  .logo{
+    max-width: 160px;
+    width: 120px;
+    height: auto;
+    margin-bottom: 20px;
+    }
+</style>
+</body>
+</html>
+
+

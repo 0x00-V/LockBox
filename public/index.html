@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LockBox - Cybersecurity and Programming Training</title>
+  <link rel="icon" type="image/x-icon" href="/Lockbox.png">
+</head>
+<body>
+  <header>
+    <img src="Lockbox.png" alt="LockBox Logo">
+    <div class="nav-buttons">
+      <a href="/login" class="login">Log In</a>
+      <a href="/register" class="join">Join for FREE</a>
+    </div>
+  </header>
+
+  <main>
+    <div>
+      <h1>Cybersecurity and Programming Training for Anyone</h1>
+      <p>
+        Learn by doing with LockBox. Hands-on lessons and challenges in cybersecurity, programming,
+        and real-world problem solving — designed for beginners and suitable for everyone.
+      </p>
+      <div class="cta">
+        <a href="/register">Join for FREE</a>
+      </div>
+    </div>
+  </main>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Courier New", monospace;
+    }
+
+    body {
+      background-color: #000;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+    }
+
+    header img {
+      height: 40px;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+    }
+
+    .nav-buttons a {
+      padding: 10px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .nav-buttons .login {
+      background: transparent;
+      border: 2px solid #fff;
+      color: #fff;
+    }
+
+    .nav-buttons .login:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    .nav-buttons .join {
+      background: #c40d0a;
+      color: #fff;
+      box-shadow: 3px 3px 0 #000;
+    }
+
+    .nav-buttons .join:hover {
+      background: #c40d0a;
+      transform: translate(-2px, -2px);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #aaa;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .cta {
+      margin-top: 30px;
+    }
+
+    .cta a {
+      display: inline-block;
+      background: #c40d0a;
+      color: #fff;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.3s;
+      box-shadow: 4px 4px 0 #000;
+    }
+
+    .cta a:hover {
+      background: #c40d0a;
+      transform: translate(-2px, -2px);
+    }
+  </style>
+</body>
+</html>
+
