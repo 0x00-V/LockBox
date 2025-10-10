@@ -29,6 +29,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true}));
 app.use(express.json());
 
+
 app.get("/", async (req, res) => {
   const sessionId = req.cookies.sessionId;
   if(!sessionId) return res.sendFile(path.join(process.cwd(), "public", 'index.html'));
@@ -40,10 +41,11 @@ app.get("/", async (req, res) => {
       return res.sendFile(path.join(process.cwd(), "public", "index.html"));
     }
   } catch(err){
-      return res.status(500).send(`Error checking session: ${err}`);
+      return res.status(404);
   }
 });
 app.use(express.static("public"));
+
 
 app.get("/login", (req, res) => {
   const sessionId = req.cookies.sessionId;
@@ -71,7 +73,7 @@ app.post("/login", async (req, res) => {
       res.cookie("sessionId", sessionId, {httpOnly: true, secure: false, sameSite: "lax", maxAge: 3600 * 1000});
       return res.redirect("/dashboard"); 
   } catch(err){
-    return res.status(500).send(`Error logging in: ${err}`);
+    return res.status(404);
   }
 });
 
@@ -96,14 +98,14 @@ app.post("/register", async (req, res) => {
     await client.query("INSERT INTO users (username, password) VALUES ($1, $2)", [username, hashedPassword]);
     return res.send(`<script> alert("Account successfully Created!"); window.location.href = "/login" </script>`);
   } catch(err){
-    return res.status(500).send(`Error creating user: ${err}`);
+    return res.send('<script> alert("Username taken."); window.location.href = "/register" </script>');
   }
 });
 
 
 app.get("/dashboard", async (req, res) => {
   const sessionId = req.cookies.sessionId;
-  if(!sessionId) return res.sendFile(path.join(process.cwd(), "public", "index.html")); 
+  if(!sessionId) return res.redirect("/login"); 
   const result = await client.query("SELECT users.username FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
   if(result.rows.length === 0) return res.redirect("/login");
   const username = result.rows[0].username;
@@ -111,6 +113,13 @@ app.get("/dashboard", async (req, res) => {
   path.join(process.cwd(), "public", "dashboard.html"), { encoding: "utf8" });
   dashboard_html = dashboard_html.replace("{{username}}", username);
   res.send(dashboard_html);
+});
+
+app.get("/learn", async (req, res) => {
+  const sessionId = req.cookies.sessionId;
+  if(!sessionId) return res.redirect("/login");
+  const result = await client.query("SELECT users.username FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
+  if(result.rows.length === 0) return res.redirect("/login");
 });
 
 
@@ -123,6 +132,10 @@ https.createServer(options, app).listen(8443, "0.0.0.0", () => {
   console.log("HTTPS Server live at: https://0.0.0.0:8443");
 });
 
+
+app.use(async (req, res) => {
+  res.status(404).redirect("/");
+});
 
 /*
 
