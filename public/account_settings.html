@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
 <head>
@@ -11,7 +12,7 @@
       <div class="user-menu">
         <img src="template-icon.png" alt="User Icon" class="user-icon" onclick="toggleMenu()">
         <ul class="dropdown" id="dropdownMenu">
-          <li><a href="/account_settings">Account Settings</a></li>
+          <li><a href="/dashboard">Dashboard</a></li>
           <li>
             <form action="/logout" method="POST">
               <button type="submit">Logout</button>
@@ -23,13 +24,7 @@
   </header>
 
   <main>
-    <h1>Hey {{username}}!</h1>
-    <section>
-      <h2>My Learning</h2>
-      <div class="learning-list">
-          <div class="learning-item"><a href="/">PLACEHOLDER (Logic for this will be included after I've completed the /learning and /practice endpoints)</a></div>
-      </div>
-    </section>
+    <h1>Settings for {{username}}!</h1>
   </main>
 
   </div>
@@ -143,31 +138,6 @@
       font-size: 2.2rem;
       margin-bottom: 30px;
       color: #c40d0a;
-    }
-    section {
-      margin-bottom: 50px;
-    }
-    section h2 {
-      font-size: 1.6rem;
-      margin-bottom: 15px;
-      color: #fff;
-      border-left: 4px solid #c40d0a;
-      padding-left: 10px;
-    }
-    .learning-list {
-      display: grid;
-      gap: 20px;
-    }
-    .learning-item {
-      background: #111;
-      padding: 20px;
-      border-radius: 8px;
-      border: 1px solid #222;
-      transition: border 0.3s;
-    }
-    .learning-item a{
-      text-decoration: none;
-      color: #fff;
     }
   </style>
 </body>

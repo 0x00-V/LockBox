@@ -103,6 +103,26 @@ app.post("/register", async (req, res) => {
 });
 
 
+app.get("/api/modules/coding", async (req, res) => {
+  try{
+    const result = await client.query("SELECT id, name, thumb, description FROM modules WHERE category = 'coding'");
+    res.json(result.rows);
+  } catch (err)
+  {
+    return res.status(500).json({error: "Failed to load modules"});
+  }
+});
+
+app.get("/api/modules/cybersecurity", async (req, res) => {
+  try{
+    const result = await client.query("SELECT id, name, thumb, description FROM modules WHERE category = 'cybersecurity'");
+    res.json(result.rows);
+  } catch (err)
+  {
+    return res.status(500).json({error: "Failed to load modules"});
+  }
+});
+
 app.get("/dashboard", async (req, res) => {
   const sessionId = req.cookies.sessionId;
   if(!sessionId) return res.redirect("/login"); 
@@ -115,11 +135,31 @@ app.get("/dashboard", async (req, res) => {
   res.send(dashboard_html);
 });
 
+
+app.get("/account_settings", async (req, res) => {
+  const sessionId = req.cookies.sessionId;
+  if(!sessionId) return res.redirect("/login"); 
+  const result = await client.query("SELECT users.username FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
+  if(result.rows.length === 0) return res.redirect("/login");
+  const username = result.rows[0].username;
+  let account_settings_html = await fsp.readFile(
+  path.join(process.cwd(), "public", "account_settings.html"), { encoding: "utf8" });
+  account_settings_html = account_settings_html.replace("{{username}}", username);
+  res.send(account_settings_html);
+
+});
+
+
 app.get("/learn", async (req, res) => {
   const sessionId = req.cookies.sessionId;
   if(!sessionId) return res.redirect("/login");
   const result = await client.query("SELECT users.username FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
   if(result.rows.length === 0) return res.redirect("/login");
+  const username = result.rows[0].username;
+  let learn_html = await fsp.readFile(
+  path.join(process.cwd(), "public", "learn.html"), { encoding: "utf8" });
+  learn_html = learn_html.replace("{{username}}", username);
+  res.send(learn_html);
 });
 
 
@@ -154,5 +194,13 @@ CREATE TABLE sessions (
   expires_at TIMESTAMP
 );
 
+CREATE TABLE modules (
+  id SERIAL PRIMARY KEY,
+  category VARCHAR(255) NOT NULL,
+  name VARCHAR(255) UNIQUE NOT NULL,
+  description TEXT,
+  content TEXT
+  thumb VARCHAR(255)
+);
 
  */
