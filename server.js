@@ -105,7 +105,15 @@ app.post("/register", async (req, res) => {
 
 app.get("/api/modules/coding", async (req, res) => {
   try{
-    const result = await client.query("SELECT id, name, thumb, description FROM modules WHERE category = 'coding'");
+    const sessionId = req.cookies.sessionId;
+    if(!sessionId) return res.status(401).json({error: "Unauthorised"});
+    const usr_result = await client.query("SELECT users.id FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
+    if(usr_result.rows.length === 0) return res.status(401).json({erorr: "Unauthorised"});
+    
+   const user_id = usr_result.rows[0].id;
+
+
+    const result = await client.query("SELECT mdl.id, mdl.name, mdl.thumb, mdl.description, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE mdl.category = 'coding'", [user_id]);
     res.json(result.rows);
   } catch (err)
   {
@@ -115,13 +123,22 @@ app.get("/api/modules/coding", async (req, res) => {
 
 app.get("/api/modules/cybersecurity", async (req, res) => {
   try{
-    const result = await client.query("SELECT id, name, thumb, description FROM modules WHERE category = 'cybersecurity'");
+    const sessionId = req.cookies.sessionId;
+    if(!sessionId) return res.status(401).json({error: "Unauthorised"});
+    const usr_result = await client.query("SELECT users.id FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
+    if(usr_result.rows.length === 0) return res.status(401).json({erorr: "Unauthorised"});
+    
+   const user_id = usr_result.rows[0].id;
+
+
+    const result = await client.query("SELECT mdl.id, mdl.name, mdl.thumb, mdl.description, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE mdl.category = 'cybersecurity'", [user_id]);
     res.json(result.rows);
   } catch (err)
   {
     return res.status(500).json({error: "Failed to load modules"});
   }
 });
+
 
 app.get("/dashboard", async (req, res) => {
   const sessionId = req.cookies.sessionId;
@@ -201,6 +218,12 @@ CREATE TABLE modules (
   description TEXT,
   content TEXT
   thumb VARCHAR(255)
+);
+
+CREATE TABLE user_module_data (
+  user_id INT REFERENCES users(id) ON DELETE CASCADE,
+  module_id INT REFERENCES modules(id) ON DELETE CASCADE,
+  completed BOOL DEFAULT false
 );
 
  */
