@@ -27,17 +27,11 @@
   
   <main>
     <section class="hero">
-        <h1>Learn Cybersecurity And Programming</h1>
-        <p>Hands-on challenges and guided learning for everyone.</p>
+        <h1>{{module_title}}</h1>
+        <h2>{{module_description}}</h2>
+        {{module_content}}
     </section>
-    <h2>Modules</h2>
-    <div class="module-tabs">
-      <button onclick="loadModules('coding')">Coding</button>
-      <button onclick="loadModules('cybersecurity')">Cybersecurity</button>
-    </div>
-    <div class="modules-grid" id="modulesGrid"></div>
-  </main>
-  </body>
+    
 <script>
     function toggleMenu() {
       const menu = document.getElementById("dropdownMenu");
@@ -50,6 +44,7 @@
       }
     });
 
+      
     async function loadModules(category = "") {
       try {
         const url = category ? `/api/modules/${category}` : "/api/modules";
@@ -68,29 +63,14 @@
         <p>${mdl.description}</p>
         ${mdl.completed ? "<span class='badge completed'>Completed</span>" : "<span class='badge incomplete'>Incomplete</span>"}
         </a>
-        <button class="pin-btn" data-id=${mdl.id}>${mdl.pinned ? "Unpin" : "Pin"}</button>
         `;
-        
-        const pin_button = card.querySelector(".pin-btn");
-        pin_button.addEventListener("click", async (e) => {
-        e.preventDefault();
-        try{
-              const res = await fetch(`/api/modules/${mdl.id}/pin`, {method: 'POST'});
-        if(res.ok) {loadModules(category);}
-      
-      } catch (err) {
-        console.error("Failed to toggle pin.");
-      }
-    });
-    grid.appendChild(card);
+        grid.appendChild(card);
       });
     } catch (err) {
       console.error("Error loading modules", err);
     }
     }
 
-
-    
     document.addEventListener("DOMContentLoaded", () => loadModules("coding"));
     </script>
 <style>
@@ -302,27 +282,6 @@
 .badge.incomplete {
   background: #c40d0a;
   color: #fff;
-}
-.pin-btn {
-  background: #111;
-  color: #aaa;
-  border: 1px solid #333;
-  border-radius: 6px;
-  padding: 6px 14px;
-  font-size: 14px;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: background 0.3s, color 0.3s, border 0.3s;
-}
-
-.pin-btn:hover {
-  background: #c40d0a;
-  color: #fff;
-  border-color: #c40d0a;
-}
-
-.pin-btn:active {
-  transform: scale(0.96);
 }
   </style>
 

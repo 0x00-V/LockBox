@@ -87,6 +87,8 @@ app.post("/logout", async (req, res) => {
 })
 
 app.get("/register", (req, res) => {
+  const sessionId = req.cookies.sessionId;
+  if(sessionId) return res.redirect('/');
   return res.sendFile(path.join(process.cwd(), "public", "register.html"));
 });
 app.post("/register", async (req, res) => {
@@ -113,7 +115,7 @@ app.get("/api/modules/coding", async (req, res) => {
    const user_id = usr_result.rows[0].id;
 
 
-    const result = await client.query("SELECT mdl.id, mdl.name, mdl.thumb, mdl.description, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE mdl.category = 'coding'", [user_id]);
+    const result = await client.query("SELECT mdl.id, mdl.name, mdl.thumb, mdl.description, umd.pinned, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE mdl.category = 'coding'", [user_id]);
     res.json(result.rows);
   } catch (err)
   {
@@ -139,6 +141,46 @@ app.get("/api/modules/cybersecurity", async (req, res) => {
   }
 });
 
+
+app.get("/api/modules/content", async (req, res) => {
+  try{
+    const sessionId = req.cookies.sessionId;
+    if(!sessionId) return res.status(401).json({error: "Unauthorised"});
+    const usr_result = await client.query("SELECT users.id FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
+    if(usr_result.rows.length === 0) return res.status(401).json({erorr: "Unauthorised"});
+    
+   const user_id = usr_result.rows[0].id;
+  
+   const result = await client.query("SELECT mdl.id, mdl.name, mdl.thumb, mdl.description mdl.content, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE mdl.category = 'cybersecurity'", [user_id]);
+   res.json(result.rows); 
+  } catch (err){
+    return res.status(500).json({error: "Failed to load module content"});
+  }
+});
+app.post("/api/modules/:id/pin", async (req, res) => {
+  const sessionId = req.cookies.sessionId;
+  if(!sessionId) return res.status(401).json({error: "Unauthorised"});
+  const usr_result = await client.query("SELECT users.id FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
+  if(usr_result.rows.length === 0) return res.status(401).json({erorr: "Unauthorised"});
+  
+  const user_id = usr_result.rows[0].id;
+  const module_id = req.params.id;
+  try{
+  const check = await client.query("SELECT pinned FROM user_module_data WHERE user_id = $1 AND module_id = $2", [user_id, module_id]);
+  if(check.rows.length > 0){
+      const newly_pinned = !check.rows[0].pinned;
+      await client.query("UPDATE user_module_data SET pinned = $1 WHERE user_id = $2 AND module_id = $3", [newly_pinned, user_id, module_id]);
+      return res.json({pinned: newly_pinned});
+  } else {
+    await client.query("INSERT INTO user_module_data (user_id, module_id, pinned) VALUES ($1, $2, true)", [user_id, module_id]);
+    return res.json({pinned: true});
+  }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({erorr: "Failed to toggle"});
+  }
+
+});
 
 app.get("/dashboard", async (req, res) => {
   const sessionId = req.cookies.sessionId;
@@ -177,6 +219,34 @@ app.get("/learn", async (req, res) => {
   path.join(process.cwd(), "public", "learn.html"), { encoding: "utf8" });
   learn_html = learn_html.replace("{{username}}", username);
   res.send(learn_html);
+});
+
+app.get("/learning", async (req, res) => {
+  const sessionId = req.cookies.sessionId;
+  if(!sessionId) return res.redirect("/login");
+  const result = await client.query("SELECT users.username FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
+  if(result.rows.length === 0) return res.redirect("/login");
+  const moduleId = req.query.id;
+  
+  const mdl_res = await client.query("SELECT name, description, content FROM modules WHERE id = $1", [moduleId]);
+  let module_title, module_description, module_content;
+  if(mdl_res.rows.length !== 0) {
+    module_title = mdl_res.rows[0].name;
+    module_description = mdl_res.rows[0].description;
+    module_content = mdl_res.rows[0].content;
+
+  } else {
+    module_title = "Unable to load module data.";
+    module_description = "Unable to load module data.";
+    module_content = "Unable to load module data.";
+
+  }
+    let learning_html = await fsp.readFile(path.join(process.cwd(), "public", "learning.html"), { encoding: "utf8" });
+  learning_html = learning_html.replace("{{module_title}}", module_title);
+  learning_html = learning_html.replace("{{module_description}}", module_description);
+  learning_html = learning_html.replace("{{module_content}}", module_content);
+  res.send(learning_html);
+  
 });
 
 
@@ -224,6 +294,7 @@ CREATE TABLE user_module_data (
   user_id INT REFERENCES users(id) ON DELETE CASCADE,
   module_id INT REFERENCES modules(id) ON DELETE CASCADE,
   completed BOOL DEFAULT false
+  pinned BOOL DEFAULT false
 );
 
  */
