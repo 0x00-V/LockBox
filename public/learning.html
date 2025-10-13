@@ -9,9 +9,9 @@
   <header>
     <a href="/"><img src="Lockbox.png" alt="Lockbox Logo"></img></a>
     <div class="nav-links">
-      <a href="/dashboard">Dashboard</a>
+      <a href="/learn">Learn</a>
       <div class="user-menu">
-        <img src="template-icon.png" alt="User Icon" class="user-icon" onclick="toggleMenu()">
+          <img src="{{avatar}}" alt="User Icon" class="user-icon" onclick="toggleMenu()">
         <ul class="dropdown" id="dropdownMenu">
           <li><a href="/account_settings">Account Settings</a></li>
           <li>
@@ -23,6 +23,7 @@
       </div>
     </div>
   </header>
+
 
   
   <main>
@@ -122,6 +123,7 @@
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid #444;
+      object-fit: cover;
       transition: border 0.3s;
     }
     .user-icon:hover {

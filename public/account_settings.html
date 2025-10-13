@@ -10,7 +10,7 @@
     <div class="nav-links">
       <a href="/learn">Learn</a>
       <div class="user-menu">
-        <img src="template-icon.png" alt="User Icon" class="user-icon" onclick="toggleMenu()">
+          <img src="{{avatar}}" alt="User Icon" class="user-icon" onclick="toggleMenu()">
         <ul class="dropdown" id="dropdownMenu">
           <li><a href="/dashboard">Dashboard</a></li>
           <li>
@@ -24,9 +24,16 @@
   </header>
 
   <main>
-    <h1>Settings for {{username}}!</h1>
-  </main>
+  <h1>Settings for {{username}}!</h1>
 
+  <form id="profileForm" enctype="multipart/form-data" method="POST" action="/api/account/upload-avatar">
+  <label for="profilePicInput">
+    <img src="{{avatar}}" alt="User Icon" class="user-icon" id="profilePicPreview">
+  </label>
+  <input type="file" id="profilePicInput" name="avatar" accept="image/*" style="display:none">
+  <button type="submit">Save</button>
+</form>
+</main>
   </div>
 
   <script>
@@ -40,6 +47,44 @@
         menu.style.display = "none";
       }
     });
+    
+    
+  const fileInput = document.getElementById("profilePicInput");
+  const previewImg = document.getElementById("profilePicPreview");
+
+  fileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        previewImg.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  document.getElementById("profileForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    if (fileInput.files[0]) {
+      formData.append("avatar", fileInput.files[0]);
+    }
+
+    try {
+      const res = await fetch("/api/account/upload-avatar", {
+        method: "POST",
+        body: formData
+      });
+      if (res.ok) {
+        alert("Profile picture updated!");
+      } else {
+        alert("Failed to upload.");
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+    }
+  });
+i</script>
   </script>
 
   <style>
@@ -91,6 +136,7 @@
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid #444;
+      object-fit: cover;
       transition: border 0.3s;
     }
     .user-icon:hover {
@@ -139,6 +185,44 @@
       margin-bottom: 30px;
       color: #c40d0a;
     }
+
+    #profileForm {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+#profilePicPreview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid #444;
+  cursor: pointer;
+  object-fit: cover;
+  transition: border 0.3s, transform 0.2s;
+}
+
+#profilePicPreview:hover {
+  border-color: #c40d0a;
+  transform: scale(1.05);
+}
+
+#profileForm button {
+  background: #111;
+  color: #aaa;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s, border 0.3s;
+}
+
+#profileForm button:hover {
+  background: #c40d0a;
+  color: #fff;
+  border-color: #c40d0a;
+}
   </style>
 </body>
 </html>
