@@ -25,12 +25,12 @@
     <h1>Hey {{username}}!</h1>
     <section>
       <h2>My Learning</h2>
-      <div class="learning-list">
-          <div class="learning-item"><a href="/">PLACEHOLDER (Logic for this will be included after I've completed the /learning and /practice endpoints)</a></div>
+      <div class="pinned">
+          <h3>Pinned Modules</h3> 
+          <p>You currently don't have any pinned modules. Pin them from the learning tab. (Logic Not Implemented.)</p>
       </div>
     </section>
   </main>
-
   </div>
 
   <script>
@@ -153,21 +153,6 @@
       color: #fff;
       border-left: 4px solid #c40d0a;
       padding-left: 10px;
-    }
-    .learning-list {
-      display: grid;
-      gap: 20px;
-    }
-    .learning-item {
-      background: #111;
-      padding: 20px;
-      border-radius: 8px;
-      border: 1px solid #222;
-      transition: border 0.3s;
-    }
-    .learning-item a{
-      text-decoration: none;
-      color: #fff;
     }
   </style>
 </body>
