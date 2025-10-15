@@ -287,13 +287,14 @@ app.get("/dashboard", async (req, res) => {
 app.get("/account_settings", async (req, res) => {
   const sessionId = req.cookies.sessionId;
   if(!sessionId) return res.redirect("/login"); 
-  const result = await client.query("SELECT users.username, users.avatar FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
+  const result = await client.query("SELECT users.username, users.avatar, users.role FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
   if(result.rows.length === 0) return res.redirect("/login");
   const username = result.rows[0].username;
+  const role = result.rows[0].role;
   const avatar = await getAvatar(result.rows[0].avatar);
   let account_settings_html = await fsp.readFile(
   path.join(process.cwd(), "public", "account_settings.html"), { encoding: "utf8" });
-  account_settings_html = account_settings_html.replace("{{username}}", username).replace(/{{avatar}}/g, avatar);
+  account_settings_html = account_settings_html.replace("{{username}}", username).replace(/{{avatar}}/g, avatar).replace(/{{role}}/g, role);
   res.send(account_settings_html);
 
 });
@@ -362,7 +363,8 @@ CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   username VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
-  avatar VARCHAR(255) DEFAULT '/uploads/avatars/template-icon.png'
+  avatar VARCHAR(255) DEFAULT '/uploads/avatars/template-icon.png',
+  role VARCHAR(255), DEFAULT 'user'
 );
 
 CREATE TABLE sessions (
