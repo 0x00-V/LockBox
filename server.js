@@ -158,11 +158,22 @@ app.get("/api/modules/cybersecurity", async (req, res) => {
     const user_id = usr_result.rows[0].id;
     const result = await client.query("SELECT mdl.id, mdl.name, mdl.thumb, mdl.description, umd.pinned, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE mdl.category = 'cybersecurity'", [user_id]);
     res.json(result.rows);
-  } catch (err)
-  {
-    return res.status(500).json({error: "Failed to load modules"});
-  }
+  } catch (err) { return res.status(500).json({error: "Failed to load modules"}); }
 });
+
+app.get("/api/modules/get_pinned", async (req, res) =>
+{
+  try{
+    const sessionId = req.cookies.sessionId;
+    if(!sessionId) return res.status(401).json({error: "Unauthorised"});
+    const usr_result = await client.query("SELECT users.id FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
+    if(usr_result.rows.length === 0) return res.status(401).json({erorr: "Unauthorised"});
+    const user_id = usr_result.rows[0].id;
+    const result = await client.query("SELECT mdl.id, mdl.name, mdl.thumb, mdl.description, umd.pinned, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE umd.pinned = true", [user_id]);
+    res.json(result.rows); 
+  } catch (err){ return res.status(500).json({error: "Failed to obtain pinned modules."}); }
+});
+
 
 
 app.get("/api/modules/content", async (req, res) => {
@@ -171,15 +182,28 @@ app.get("/api/modules/content", async (req, res) => {
     if(!sessionId) return res.status(401).json({error: "Unauthorised"});
     const usr_result = await client.query("SELECT users.id FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
     if(usr_result.rows.length === 0) return res.status(401).json({erorr: "Unauthorised"});
-    
-   const user_id = usr_result.rows[0].id;
-   const result = await client.query("SELECT mdl.id, mdl.name, mdl.thumb, mdl.description, mdl.content, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE mdl.category = 'cybersecurity'", [user_id]);
-   res.json(result.rows); 
-  } catch (err){
-    return res.status(500).json({error: "Failed to load module content"});
-  }
+    const user_id = usr_result.rows[0].id;
+    const result = await client.query("SELECT mdl.id, mdl.name, mdl.thumb, mdl.description, mdl.content, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE mdl.category = 'cybersecurity'", [user_id]);
+    res.json(result.rows); 
+  } catch (err){ return res.status(500).json({error: "Failed to load module content"}); }
 });
 
+app.get("/api/modules/:id/status", async (req, res) => {
+  const sessionId = req.cookies.sessionId;
+  if(!sessionId) return res.status(401).json({error: "Unauthorised"});
+  const usr_result = await client.query("SELECT users.id FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
+  if(usr_result.rows.length === 0) return res.status(401).json({erorr: "Unauthorised"});  
+  const user_id = usr_result.rows[0].id;
+  const module_id = req.params.id;
+  try{
+    const result = await client.query("SELECT completed FROM user_module_data WHERE user_id = $1 AND module_id = $2", [user_id, module_id]);
+    const completed = result.rows.length > 0 ? result.rows[0].completed : false;
+    res.json({completed});
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({error: "Failed to fetch status for module"});
+  }
+ });
 
 app.post("/api/modules/:id/pin", async (req, res) => {
   const sessionId = req.cookies.sessionId;
@@ -200,7 +224,31 @@ app.post("/api/modules/:id/pin", async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({erorr: "Failed to toggle"});
+    res.status(500).json({error: "Failed to toggle"});
+  }
+});
+
+app.post("/api/modules/:id/complete", async (req, res) => {
+  const sessionId = req.cookies.sessionId;
+  if(!sessionId) return res.status(401).json({error: "Unauthorised"});
+  const usr_result = await client.query("SELECT users.id FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
+  if(usr_result.rows.length === 0) return res.status(401).json({erorr: "Unauthorised"});  
+  const user_id = usr_result.rows[0].id;
+  const module_id = parseInt(req.params.id);
+  try{
+    const check = await client.query("SELECT completed FROM user_module_data WHERE user_id = $1 AND module_id = $2", [user_id, module_id]);
+    let updated_stat;
+    if(check.rows.length > 0) {
+      updated_stat = !check.rows[0].completed;
+      await client.query("UPDATE user_module_data SET completed = $1 WHERE user_id = $2 AND module_id = $3", [updated_stat, user_id, module_id]);
+    } else {
+      updated_stat = true;
+      await client.query("INSERT INTO user_module_data (user_id, module_id, completed) VALUES ($1, $2, true)", [user_id, module_id]);
+    }
+    res.json({completed: updated_stat});
+  } catch (err){ 
+    console.error(err);
+    res.status(500).json({ error: "Failed to toggle module stat"});
   }
 });
 
@@ -285,7 +333,7 @@ app.get("/learning", async (req, res) => {
   }
   const avatar = await getAvatar(result.rows[0].avatar);
   let learning_html = await fsp.readFile(path.join(process.cwd(), "public", "learning.html"), { encoding: "utf8" });
-  learning_html = learning_html.replace("{{module_title}}", module_title).replace("{{module_description}}", module_description).replace("{{module_content}}", module_content).replace(/{{avatar}}/g, avatar);
+  learning_html = learning_html.replace("{{module_title}}", module_title).replace("{{module_description}}", module_description).replace("{{module_content}}", module_content).replace(/{{avatar}}/g, avatar).replace("{{module_id}}", String(moduleId));
   res.send(learning_html);
 });
 
