@@ -49,7 +49,7 @@
     });
     async function loadModules(category = "") {
       try {
-        const url = category ? `/api/modules/${category}` : "/api/modules";
+        const url = category ? `/api/modules/category/${category}` : "/api/modules/category/";
         const res = await fetch(url);
         const modules = await res.json();
         const grid = document.getElementById("modulesGrid");

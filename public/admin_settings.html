@@ -25,13 +25,12 @@
   </header>
   <main>
     <section class="hero">
-        <h1>Module Manager v1.0</h1>
+        <h1>Module Manager</h1>
     </section>
     <h2>Modules</h2>
     <div class="module-tabs">
       <button onclick="loadModules('coding')">Coding</button>
       <button onclick="loadModules('cybersecurity')">Cybersecurity</button>
-      <button class="create-mdl">Create A Module</button>
     </div>
     <div class="modules-grid" id="modulesGrid"></div>
   </main>
@@ -49,7 +48,7 @@
     });
     async function loadModules(category = "") {
       try {
-        const url = category ? `/api/modules/${category}` : "/api/modules";
+        const url = category ? `/api/modules/category/${category}` : "/api/modules/category/";
         const res = await fetch(url);
         const modules = await res.json();
         const grid = document.getElementById("modulesGrid");
@@ -64,8 +63,8 @@
         <h3>${mdl.name}</h3>
         <p>${mdl.description}</p>
         </a>
-        <button class="pin-btn" data-id=${mdl.id}>Edit</button>
-        <button class="pin-btn" data-id=${mdl.id}>Delete</button>
+        <button class="pin-btn">Edit</button>
+        <button class="pin-btn">Delete</button>
         `;
     grid.appendChild(card);
       });
@@ -216,9 +215,6 @@
       gap: 20px;
       margin-bottom: 20px;
       }
-    .module-tabs .create-mdl{
-      background-color: #c40d0a;
-    }
     .module-tabs button {
       background: #111;
       color: #aaa;
@@ -229,7 +225,6 @@
       border-radius: 6px;
       transition: background 0.3s, color 0.3s;
     }
-   
     .module-tabs button:hover {
       background: #c40d0a;
       color: #fff;
@@ -300,4 +295,5 @@
   </style>
 
 </html>
+
 

@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
 <head>
@@ -30,6 +29,24 @@
   </label>
   <input type="file" id="profilePicInput" name="avatar" accept="image/*" style="display:none">
   <button type="submit">Save</button>
+</form>
+<form class="passwordForm" method="POST" action="/api/account/change_password">
+  <label for="old_password">OLD PASSWORD</label>
+  <div class="password-field">
+    <input type="password" name="old_password" placeholder="***********">
+    <button type="button" class="toggle-password">show</button>
+  </div>
+  <label for="new_password_1">NEW PASSWORD</label>
+  <div class="password-field">
+    <input type="password" name="new_password_1" placeholder="***********">
+    <button type="button" class="toggle-password">show</button>
+  </div>
+  <label for="new_password_2">CONFIRM PASSWORD</label>
+  <div class="password-field">
+    <input type="password" name="new_password_2" placeholder="***********">
+    <button type="button" class="toggle-password">show</button>
+  </div>
+  <button type="submit">CHANGE PASSWORD</button>
 </form>
 </main>
   </div>
@@ -99,6 +116,15 @@
         console.error("Error fetching user role:", err);
       }
     }
+
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = btn.previousElementSibling;
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    btn.textContent = isHidden ? 'hide' : 'show';
+  });
+});
 
     document.addEventListener("DOMContentLoaded", () => {
       getUserRole();
@@ -204,13 +230,11 @@
       margin-bottom: 30px;
       color: #c40d0a;
     }
-
     #profileForm {
     display: flex;
     align-items: center;
     gap: 20px;
   }
-
 #profilePicPreview {
   width: 80px;
   height: 80px;
@@ -220,12 +244,10 @@
   object-fit: cover;
   transition: border 0.3s, transform 0.2s;
 }
-
 #profilePicPreview:hover {
   border-color: #c40d0a;
   transform: scale(1.05);
 }
-
 #profileForm button {
   background: #111;
   color: #aaa;
@@ -236,11 +258,77 @@
   cursor: pointer;
   transition: background 0.3s, color 0.3s, border 0.3s;
 }
-
 #profileForm button:hover {
   background: #c40d0a;
   color: #fff;
   border-color: #c40d0a;
+}
+.passwordForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 40px;
+  padding: 0 10px;
+  max-width: 400px;
+}
+.passwordForm label {
+  color: #c40d0a;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+.password-field {
+  position: relative;
+  width: 100%;
+}
+.password-field input {
+  width: 100%;
+  background: transparent;
+  color: #fff;
+  border: none;
+  border-bottom: 1px solid #333;
+  padding: 10px 45px 10px 5px;
+  font-family: "Courier New", monospace;
+  font-size: 15px;
+  transition: border-color 0.3s;
+}
+.password-field input:focus {
+  border-color: #c40d0a;
+  outline: none;
+}
+.password-field .toggle-password {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #c40d0a;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s, color 0.3s;
+  font-family: "Courier New", monospace;
+}
+.password-field .toggle-password:hover {
+  opacity: 1;
+  color: #ff3c3c;
+}
+.passwordForm button[type="submit"] {
+  background: none;
+  color: #c40d0a;
+  border: 1px solid #c40d0a;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+  align-self: flex-start;
+}
+.passwordForm button[type="submit"]:hover {
+  background: #c40d0a;
+  color: #fff;
 }
   </style>
 </body>

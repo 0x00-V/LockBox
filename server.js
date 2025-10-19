@@ -134,32 +134,69 @@ app.post("/register", async (req, res) => {
 
 
 // API ENDPOINTS - START
-app.get("/api/modules/coding", async (req, res) => {
+app.post("/api/account/change_password", async (req,res) => {
+  const sessionId = req.cookies.sessionId;
+  if(!sessionId) return res.status(401).json({ error: "Unauthorised" });
+  const result = await client.query("SELECT users.username, users.password FROM sessions JOIN users on sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
+  if(result.rows.length === 0){
+    return res.status(401).json({ error: "Unauthorised" });
+  }
   try{
-    const sessionId = req.cookies.sessionId;
-    if(!sessionId) return res.status(401).json({error: "Unauthorised"});
-    const usr_result = await client.query("SELECT users.id FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
-    if(usr_result.rows.length === 0) return res.status(401).json({erorr: "Unauthorised"});
-    const user_id = usr_result.rows[0].id;
-    const result = await client.query("SELECT mdl.id, mdl.name, mdl.thumb, mdl.description, umd.pinned, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE mdl.category = 'coding'", [user_id]);
-    res.json(result.rows);
-  } catch (err)
-  {
-    return res.json({error: "Failed to load modules"});
+    const {old_password, new_password_1, new_password_2} = req.body;
+    const user = result.rows[0];
+    if(new_password_1 !== new_password_2){
+      return res.send('<script> alert("Password do not match"); window.location.href="/account_settings"</script>');
+    } else if(new_password_1 === old_password || new_password_2 === old_password){
+      return res.send('<script> alert("You cannot use the same password"); window.location.href="/account_settings"</script>');
+    }
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(new_password_1, saltRounds);
+    const matching = await bcrypt.compare(new_password_1, user.password);
+    const correct_old = await bcrypt.compare(old_password, user.password);
+    if(matching){
+      return res.send('<script> alert("Passwords are the same"); window.location.href="/account_settings"</script>');
+    }
+    if(!correct_old){
+      return res.send('<script> alert("Incorrect password"); window.location.href="/account_settings"</script>');
+    }
+    await client.query("UPDATE users SET password = $1 WHERE username = $2", [hashedPassword, user.username]);
+    return res.send('<script> alert("Password successfully updated"); window.location.href="/account_settings"</script>');
+  } catch (err){
+    return res.json({ error: "Internal server error" });
   }
 });
 
 
-app.get("/api/modules/cybersecurity", async (req, res) => {
-  try{
-    const sessionId = req.cookies.sessionId;
-    if(!sessionId) return res.status(401).json({error: "Unauthorised"});
-    const usr_result = await client.query("SELECT users.id FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
-    if(usr_result.rows.length === 0) return res.status(401).json({erorr: "Unauthorised"});
-    const user_id = usr_result.rows[0].id;
-    const result = await client.query("SELECT mdl.id, mdl.name, mdl.thumb, mdl.description, umd.pinned, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE mdl.category = 'cybersecurity'", [user_id]);
+
+app.get("/api/modules/category/:category", async (req, res) => {
+  const sessionId = req.cookies.sessionId;
+  if (!sessionId) return res.status(401).json({ error: "Unauthorized" });
+
+  const usr_result = await client.query(
+    "SELECT users.id FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()",
+    [sessionId]
+  );
+
+  if (usr_result.rows.length === 0) return res.status(401).json({ error: "Unauthorized" });
+
+  const user_id = usr_result.rows[0].id;
+  const category = req.params.category;
+
+  try {
+    const result = await client.query(
+      "SELECT mdl.id, mdl.name, mdl.thumb, mdl.description, umd.pinned, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE mdl.category = $2",
+      [user_id, category]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "No modules found for this category" });
+    }
+
     res.json(result.rows);
-  } catch (err) { return res.json({error: "Failed to load modules"}); }
+  } catch (err) {
+    console.error("Error fetching modules:", err);
+    res.status(500).json({ error: "Failed to load modules" });
+  }
 });
 
 app.get("/api/modules/get_pinned", async (req, res) =>
@@ -176,7 +213,6 @@ app.get("/api/modules/get_pinned", async (req, res) =>
 });
 
 
-
 app.get("/api/modules/content", async (req, res) => {
   try{
     const sessionId = req.cookies.sessionId;
@@ -188,6 +224,7 @@ app.get("/api/modules/content", async (req, res) => {
     res.json(result.rows); 
   } catch (err){ return res.json({error: "Failed to load module content"}); }
 });
+
 
 app.get("/api/modules/:id/status", async (req, res) => {
   const sessionId = req.cookies.sessionId;
@@ -205,6 +242,7 @@ app.get("/api/modules/:id/status", async (req, res) => {
     res.json({error: "Failed to fetch status for module"});
   }
  });
+
 
 app.post("/api/modules/:id/pin", async (req, res) => {
   const sessionId = req.cookies.sessionId;
@@ -228,6 +266,7 @@ app.post("/api/modules/:id/pin", async (req, res) => {
     res.json({error: "Failed to toggle"});
   }
 });
+
 
 app.post("/api/modules/:id/complete", async (req, res) => {
   const sessionId = req.cookies.sessionId;
