@@ -1,6 +1,6 @@
 
 Postgresql is used for this project.
-## .env template:
+## .env template (Make sure DB creds match ones you set for your psql db and user or dockercompose): 
 ```
 DB_USER=
 DB_PASS=
@@ -63,3 +63,4 @@ To turn regular user into admin, use:
 <img width="2558" height="1303" alt="image" src="https://github.com/user-attachments/assets/6cad1ef2-48a6-41ac-a530-7ece6e347863" />
 <img width="346" height="324" alt="image" src="https://github.com/user-attachments/assets/26cb8f9d-d990-4679-b11e-9b11b833cabc" />
 <img width="2559" height="923" alt="image" src="https://github.com/user-attachments/assets/75e645d3-45cc-4815-9f9e-f82ee7ac0ecb" />
+
