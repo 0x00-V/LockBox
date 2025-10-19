@@ -12,3 +12,53 @@
 <img width="2559" height="1033" alt="image" src="https://github.com/user-attachments/assets/e2a1bf16-b2d9-4e26-8871-cf196aa8af66" />
 <img width="2559" height="788" alt="image" src="https://github.com/user-attachments/assets/da3a3440-b6b2-4a73-81ac-7b66e2417c2e" />
 <img width="2558" height="1303" alt="image" src="https://github.com/user-attachments/assets/6cad1ef2-48a6-41ac-a530-7ece6e347863" />
+<img width="346" height="324" alt="image" src="https://github.com/user-attachments/assets/26cb8f9d-d990-4679-b11e-9b11b833cabc" />
+<img width="2559" height="923" alt="image" src="https://github.com/user-attachments/assets/75e645d3-45cc-4815-9f9e-f82ee7ac0ecb" />
+
+
+Postgresql is used for this project.
+## .env template:
+DB_USER=
+DB_PASS=
+DB_HOST=
+DB_PORT=5432
+DB_DATABASE=
+
+
+## Up to date schemas:
+
+```
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  avatar VARCHAR(255) DEFAULT '/uploads/avatars/template-icon.png',
+  role VARCHAR(255), DEFAULT 'user'
+);
+
+CREATE TABLE sessions (
+  session_id VARCHAR(255) PRIMARY KEY,
+  user_id INT REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  expires_at TIMESTAMP
+);
+
+CREATE TABLE modules (
+  id SERIAL PRIMARY KEY,
+  category VARCHAR(255) NOT NULL,
+  name VARCHAR(255) UNIQUE NOT NULL,
+  description TEXT,
+  content TEXT,
+  thumb VARCHAR(255)
+);
+
+CREATE TABLE user_module_data (
+  user_id INT REFERENCES users(id) ON DELETE CASCADE,
+  module_id INT REFERENCES modules(id) ON DELETE CASCADE,
+  completed BOOL DEFAULT false,
+  pinned BOOL DEFAULT false
+);
+```
+
+To turn regular user into admin, use:
+`UPDATE users SET role = 'admin' WHERE username = 'YOURNAMEHERE';`
