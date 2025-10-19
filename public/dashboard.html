@@ -33,8 +33,6 @@
 </div>    
 </section>
   </main>
-  
-
   <script>
     function toggleMenu() {
       const menu = document.getElementById("dropdownMenu");
@@ -46,20 +44,17 @@
         menu.style.display = "none";
       }
     });
-
     async function loadPinned() {
       try {
         const res = await fetch("/api/modules/get_pinned");
         const modules = await res.json();
         const grid = document.getElementById("modulesGrid");
         grid.innerHTML = "";
-
         if(modules.length === 0)
         {
           grid.innerHTML = "<p class='no-modules'>You currently don't have any modules pinned. Find modules <a href='/learn'>here</a></p>";
           return;
         }
-
         modules.forEach(mdl => {
         const card = document.createElement("div");
         card.className = "module-card";
@@ -89,9 +84,6 @@
       console.error("Error loading modules", err);
     }
     }
-
-
-
     async function getUserRole() {
       try {
         const res = await fetch("/api/fetch/userRole");
@@ -115,16 +107,13 @@
         console.error("Error fetching user role:", err);
       }
     }
-
     document.addEventListener("DOMContentLoaded", () => 
       {
       getUserRole();
       loadPinned();
       
       });
-
   </script>
-
   <style>
     * {
       margin: 0;

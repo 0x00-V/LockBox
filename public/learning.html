@@ -32,45 +32,67 @@
         <button id="complete-button" class="complete-btn" data-id="{{module_id}}">Loading...</button>
     </section>
 <script>
-function toggleMenu() {
-  const menu = document.getElementById("dropdownMenu");
-  menu.style.display = (menu.style.display === "block") ? "none" : "block";
-}
-document.addEventListener("click", (e) => {
-  const menu = document.getElementById("dropdownMenu");
-  if (!e.target.closest(".user-menu")) {
-    menu.style.display = "none";
+  function toggleMenu() {
+    const menu = document.getElementById("dropdownMenu");
+    menu.style.display = (menu.style.display === "block") ? "none" : "block";
   }
-});
+  document.addEventListener("click", (e) => {
+    const menu = document.getElementById("dropdownMenu");
+    if (!e.target.closest(".user-menu")) {
+      menu.style.display = "none";
+    }
+  });
+  async function getUserRole() {
+      try {
+        const res = await fetch("/api/fetch/userRole");
+        const usr_role = await res.json();
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const btn = document.getElementById("complete-button");
-  const id = btn.getAttribute("data-id");
-
-  async function loadStatus() {
-    try {
-      const res = await fetch(`/api/modules/${id}/status`);
-      if (res.ok) {
-        const data = await res.json();
-        btn.classList.remove("completed", "incomplete", "error");
-        if (data.completed) {
-          btn.classList.add("completed");
-          btn.textContent = "Mark Incomplete";
-        } else {
-          btn.classList.add("incomplete");
-          btn.textContent = "Mark Complete";
+        if (usr_role.role === "admin") {
+          const dm = document.getElementById("dropdownMenu");
+          const li = document.createElement("li");
+          const admin_settings_link = document.createElement("a");
+          admin_settings_link.href = "/admin/settings";
+          admin_settings_link.textContent = "Admin Settings";
+          li.appendChild(admin_settings_link);
+          const logoutLi = dm.querySelector("form")?.closest("li");
+          if (logoutLi) {
+            dm.insertBefore(li, logoutLi);
+          } else {
+            dm.appendChild(li);
+          }
         }
-      } else {
+      } catch (err) {
+        console.error("Error fetching user role:", err);
+      }
+    }
+  document.addEventListener("DOMContentLoaded", async () => {
+    const btn = document.getElementById("complete-button");
+    const id = btn.getAttribute("data-id");
+
+    async function loadStatus() {
+      try {
+        const res = await fetch(`/api/modules/${id}/status`);
+        if (res.ok) {
+          const data = await res.json();
+          btn.classList.remove("completed", "incomplete", "error");
+          if (data.completed) {
+            btn.classList.add("completed");
+            btn.textContent = "Mark Incomplete";
+          } else {
+            btn.classList.add("incomplete");
+            btn.textContent = "Mark Complete";
+          }
+        } else {
+          btn.classList.remove("completed", "incomplete");
+          btn.classList.add("error");
+          btn.textContent = "Error";
+        }
+      } catch {
         btn.classList.remove("completed", "incomplete");
         btn.classList.add("error");
         btn.textContent = "Error";
       }
-    } catch {
-      btn.classList.remove("completed", "incomplete");
-      btn.classList.add("error");
-      btn.textContent = "Error";
     }
-  }
 
   btn.addEventListener("click", async () => {
     try {
@@ -96,9 +118,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       btn.textContent = "Error";
     }
   });
-
+  
+  getUserRole();
   loadStatus();
-});
+  });
 </script>
 
 <style>

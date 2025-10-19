@@ -22,11 +22,8 @@
       </div>
     </div>
   </header>
-
   <main>
   <h1>Settings for {{username}}!</h1>
-  <p>Role: {{role}}</p>
-
   <form id="profileForm" enctype="multipart/form-data" method="POST" action="/api/account/upload-avatar">
   <label for="profilePicInput">
     <img src="{{avatar}}" alt="User Icon" class="user-icon" id="profilePicPreview">
@@ -36,7 +33,6 @@
 </form>
 </main>
   </div>
-
   <script>
     function toggleMenu() {
       const menu = document.getElementById("dropdownMenu");
@@ -48,11 +44,8 @@
         menu.style.display = "none";
       }
     });
-    
-    
   const fileInput = document.getElementById("profilePicInput");
   const previewImg = document.getElementById("profilePicPreview");
-
   fileInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -63,14 +56,12 @@
       reader.readAsDataURL(file);
     }
   });
-
   document.getElementById("profileForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const formData = new FormData();
     if (fileInput.files[0]) {
       formData.append("avatar", fileInput.files[0]);
     }
-
     try {
       const res = await fetch("/api/account/upload-avatar", {
         method: "POST",
@@ -85,7 +76,34 @@
       console.error("Upload error:", err);
     }
   });
-i</script>
+  async function getUserRole() {
+      try {
+        const res = await fetch("/api/fetch/userRole");
+        const usr_role = await res.json();
+
+        if (usr_role.role === "admin") {
+          const dm = document.getElementById("dropdownMenu");
+          const li = document.createElement("li");
+          const admin_settings_link = document.createElement("a");
+          admin_settings_link.href = "/admin/settings";
+          admin_settings_link.textContent = "Admin Settings";
+          li.appendChild(admin_settings_link);
+          const logoutLi = dm.querySelector("form")?.closest("li");
+          if (logoutLi) {
+            dm.insertBefore(li, logoutLi);
+          } else {
+            dm.appendChild(li);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching user role:", err);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      getUserRole();
+    });
+</script>
   </script>
 
   <style>

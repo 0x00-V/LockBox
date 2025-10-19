@@ -133,6 +133,7 @@ app.post("/register", async (req, res) => {
 });
 
 
+// API ENDPOINTS - START
 app.get("/api/modules/coding", async (req, res) => {
   try{
     const sessionId = req.cookies.sessionId;
@@ -284,6 +285,8 @@ app.get("/api/fetch/userRole", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+// API ENDPOINTS - START
+
 
 app.get("/dashboard", async (req, res) => {
   const sessionId = req.cookies.sessionId;
@@ -311,8 +314,12 @@ app.get("/account_settings", async (req, res) => {
   path.join(process.cwd(), "public", "account_settings.html"), { encoding: "utf8" });
   account_settings_html = account_settings_html.replace("{{username}}", username).replace(/{{avatar}}/g, avatar).replace(/{{role}}/g, role);
   res.send(account_settings_html);
-
 });
+
+app.get("/administration", async (req, res) =>)
+{
+ // implement next
+}
 
 
 app.get("/learn", async (req, res) => {

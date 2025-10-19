@@ -85,7 +85,35 @@
       console.error("Error loading modules", err);
     }
     }
-    document.addEventListener("DOMContentLoaded", () => loadModules("coding"));
+    async function getUserRole() {
+      try {
+        const res = await fetch("/api/fetch/userRole");
+        const usr_role = await res.json();
+
+        if (usr_role.role === "admin") {
+          const dm = document.getElementById("dropdownMenu");
+          const li = document.createElement("li");
+          const admin_settings_link = document.createElement("a");
+          admin_settings_link.href = "/admin/settings";
+          admin_settings_link.textContent = "Admin Settings";
+          li.appendChild(admin_settings_link);
+          const logoutLi = dm.querySelector("form")?.closest("li");
+          if (logoutLi) {
+            dm.insertBefore(li, logoutLi);
+          } else {
+            dm.appendChild(li);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching user role:", err);
+      }
+    }
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+      getUserRole();
+      loadModules("coding")
+    });
     </script>
 <style>
     * {
