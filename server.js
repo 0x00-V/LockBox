@@ -270,6 +270,21 @@ app.post("/api/account/upload-avatar", upload.single("avatar"), async (req, res)
 });
 
 
+app.get("/api/fetch/userRole", async (req, res) => {
+  const sessionId = req.cookies.sessionId;
+  if (!sessionId) return res.status(401).json({ error: "Unauthorised" });
+  try {
+    const result = await client.query("SELECT users.role FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: "Unauthorised" });
+    }
+    return res.json({ role: result.rows[0].role });
+  } catch (err) {
+    console.error("Error fetching user role:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.get("/dashboard", async (req, res) => {
   const sessionId = req.cookies.sessionId;
   if(!sessionId) return res.redirect("/login"); 
