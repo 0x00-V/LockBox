@@ -99,7 +99,7 @@ app.post("/login", async (req, res) => {
       res.cookie("sessionId", sessionId, {httpOnly: true, secure: false, sameSite: "lax", maxAge: 3600 * 1000});
       return res.redirect("/dashboard"); 
   } catch(err){
-    return res.status(404);
+    return res.redirect("/");
   }
 });
 
@@ -145,7 +145,7 @@ app.get("/api/modules/coding", async (req, res) => {
     res.json(result.rows);
   } catch (err)
   {
-    return res.status(500).json({error: "Failed to load modules"});
+    return res.json({error: "Failed to load modules"});
   }
 });
 
@@ -159,7 +159,7 @@ app.get("/api/modules/cybersecurity", async (req, res) => {
     const user_id = usr_result.rows[0].id;
     const result = await client.query("SELECT mdl.id, mdl.name, mdl.thumb, mdl.description, umd.pinned, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE mdl.category = 'cybersecurity'", [user_id]);
     res.json(result.rows);
-  } catch (err) { return res.status(500).json({error: "Failed to load modules"}); }
+  } catch (err) { return res.json({error: "Failed to load modules"}); }
 });
 
 app.get("/api/modules/get_pinned", async (req, res) =>
@@ -172,7 +172,7 @@ app.get("/api/modules/get_pinned", async (req, res) =>
     const user_id = usr_result.rows[0].id;
     const result = await client.query("SELECT mdl.id, mdl.name, mdl.thumb, mdl.description, umd.pinned, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE umd.pinned = true", [user_id]);
     res.json(result.rows); 
-  } catch (err){ return res.status(500).json({error: "Failed to obtain pinned modules."}); }
+  } catch (err){ return res.json({error: "Failed to obtain pinned modules."}); }
 });
 
 
@@ -186,7 +186,7 @@ app.get("/api/modules/content", async (req, res) => {
     const user_id = usr_result.rows[0].id;
     const result = await client.query("SELECT mdl.id, mdl.name, mdl.thumb, mdl.description, mdl.content, COALESCE(umd.completed, false) AS completed FROM modules mdl LEFT JOIN user_module_data umd ON umd.module_id = mdl.id AND umd.user_id = $1 WHERE mdl.category = 'cybersecurity'", [user_id]);
     res.json(result.rows); 
-  } catch (err){ return res.status(500).json({error: "Failed to load module content"}); }
+  } catch (err){ return res.json({error: "Failed to load module content"}); }
 });
 
 app.get("/api/modules/:id/status", async (req, res) => {
@@ -202,7 +202,7 @@ app.get("/api/modules/:id/status", async (req, res) => {
     res.json({completed});
   } catch (err) {
     console.error(err);
-    res.status(500).json({error: "Failed to fetch status for module"});
+    res.json({error: "Failed to fetch status for module"});
   }
  });
 
@@ -225,7 +225,7 @@ app.post("/api/modules/:id/pin", async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({error: "Failed to toggle"});
+    res.json({error: "Failed to toggle"});
   }
 });
 
@@ -249,7 +249,7 @@ app.post("/api/modules/:id/complete", async (req, res) => {
     res.json({completed: updated_stat});
   } catch (err){ 
     console.error(err);
-    res.status(500).json({ error: "Failed to toggle module stat"});
+    res.json({ error: "Failed to toggle module stat"});
   }
 });
 
@@ -281,8 +281,7 @@ app.get("/api/fetch/userRole", async (req, res) => {
     }
     return res.json({ role: result.rows[0].role });
   } catch (err) {
-    console.error("Error fetching user role:", err);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.json({ error: "Internal server error" });
   }
 });
 // API ENDPOINTS - START
@@ -316,10 +315,17 @@ app.get("/account_settings", async (req, res) => {
   res.send(account_settings_html);
 });
 
-app.get("/administration", async (req, res) =>)
-{
- // implement next
-}
+app.get("/admin/settings", async (req, res) => {
+  const sessionId = req.cookies.sessionId;
+  if(!sessionId) return res.redirect("/login");
+  const result = await client.query("SELECT users.username, users.avatar, users.role FROM sessions JOIN users ON sessions.user_id = users.id WHERE sessions.session_id = $1 AND sessions.expires_at > NOW()", [sessionId]);
+  if(result.rows.length === 0) return res.redirect("/login");
+  if(result.rows[0].role !== "admin") return res.redirect("/dashboard");
+  const avatar = await getAvatar(result.rows[0].avatar);
+  let admin_settings_html = await fsp.readFile(path.join(process.cwd(), "public", "admin_settings.html"), { encoding: "utf8"});
+  admin_settings_html = admin_settings_html.replace(/{{avatar}}/g, avatar);
+  res.send(admin_settings_html);
+});
 
 
 app.get("/learn", async (req, res) => {
