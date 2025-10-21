@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
 
     environment:
-      POSTGRES_USER: lockbox_user # change
+      POSTGRES_USER: dan # change
       POSTGRES_PASSWORD: lockbox_pass # change
       POSTGRES_DB: lockbox # chgange
     ports:
