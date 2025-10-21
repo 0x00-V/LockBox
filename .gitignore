@@ -1,6 +1,6 @@
 certs/server.key
 certs/server.cert
-
+db/
 # Logs
 logs
 *.log
