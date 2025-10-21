@@ -1,23 +1,57 @@
+# LockBox
 
-Postgresql is used for this project.
-## .env template (Make sure DB creds match ones you set for your psql db and user or dockercompose): 
-```
-DB_USER=
-DB_PASS=
-DB_HOST=
+**Cybersecurity & Programming Training Platform**
+Full-stack web application built with **Node.js, Express, PostgreSQL, and Docker (Docker Not Required)**.
+Provides user authentication, module management, and progress tracking (completed & pinned modules).
+
+---
+
+## Setup Instructions
+
+### 1. Environment Variables
+
+Create a `.env` file in the project root with your database credentials:
+
+```env
+DB_USER=your_user
+DB_PASS=your_password
+DB_HOST=localhost
 DB_PORT=5432
-DB_DATABASE=
+DB_DATABASE=lockbox
 ```
-To run the docker container, do: `docker compose up -d`. Then input the tables manually for now.
 
-Gen certs for HTTPS:
-`cd certs`
-`openssl genrsa -out server.key 2048`
-`openssl req -new -x509 -key server.key -out server.cert -days 365`
+> Ensure these match either your **Postgres instance** or the **Docker Compose setup** below.
 
-## Up to date schemas:
+---
 
+### 2. Database with Docker
+
+To start PostgreSQL using Docker Compose:
+
+```bash
+docker compose up -d
 ```
+
+This will run PostgreSQL and mount `db/init.sql` automatically.
+For now, you’ll need to create the tables manually (see schemas below).
+
+---
+
+### 3. HTTPS Certificates
+
+Generate self-signed certs for local HTTPS development:
+
+```bash
+cd certs
+openssl genrsa -out server.key 2048
+openssl req -new -x509 -key server.key -out server.cert -days 365
+```
+
+---
+
+## Database Schemas
+
+```sql
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   username VARCHAR(255) UNIQUE NOT NULL,
@@ -50,26 +84,67 @@ CREATE TABLE user_module_data (
 );
 ```
 
-To turn regular user into admin, use:
-`UPDATE users SET role = 'admin' WHERE username = 'YOURNAMEHERE';`
+---
 
-## Current State
-<img width="2554" height="1439" alt="image" src="https://github.com/user-attachments/assets/51795b2b-c93d-4ad4-9d61-7751be81b7c3" />
-<img width="2559" height="1439" alt="image" src="https://github.com/user-attachments/assets/0258dacc-3464-4305-a1e6-ff59847e93a8" />
-<img width="2559" height="1439" alt="image" src="https://github.com/user-attachments/assets/ea6d79aa-f258-446d-b0e3-b9f71fa5ef97" />
-<img width="2558" height="1308" alt="image" src="https://github.com/user-attachments/assets/6a9dacb5-290a-4208-aed5-75845cb857dd" />
-<img width="2559" height="1294" alt="image" src="https://github.com/user-attachments/assets/2b82e62b-f6e0-4628-af12-9571cb727530" />
-<img width="2545" height="1280" alt="image" src="https://github.com/user-attachments/assets/13565a0e-0f83-4c3d-9e44-ceb7cd6876ed" />
-<img width="2555" height="1305" alt="image" src="https://github.com/user-attachments/assets/d02834df-34a8-4539-85cc-95a80901b40a" />
-<img width="2556" height="1286" alt="image" src="https://github.com/user-attachments/assets/475a30ef-183f-43f4-965c-314765dd46c9" />
-<img width="2559" height="1343" alt="image" src="https://github.com/user-attachments/assets/bf82e4c8-ff32-4d47-b086-067d4b9c4568" />
-<img width="2559" height="1439" alt="image" src="https://github.com/user-attachments/assets/95568e4e-349a-4ad9-b286-689f60346bb9" />
-<img width="2559" height="1033" alt="image" src="https://github.com/user-attachments/assets/e2a1bf16-b2d9-4e26-8871-cf196aa8af66" />
-<img width="2559" height="788" alt="image" src="https://github.com/user-attachments/assets/da3a3440-b6b2-4a73-81ac-7b66e2417c2e" />
-<img width="2558" height="1303" alt="image" src="https://github.com/user-attachments/assets/6cad1ef2-48a6-41ac-a530-7ece6e347863" />
-<img width="346" height="324" alt="image" src="https://github.com/user-attachments/assets/26cb8f9d-d990-4679-b11e-9b11b833cabc" />
-<img width="2559" height="923" alt="image" src="https://github.com/user-attachments/assets/75e645d3-45cc-4815-9f9e-f82ee7ac0ecb" />
+Admin Account Creation
 
+To give a user admin rights, run:
 
+```sql
+UPDATE users SET role = 'admin' WHERE username = 'YOURNAMEHERE';
+```
 
+---
+
+## 📸 Current State
+
+### Landing Page
+
+<img width="2559" alt="Landing" src="https://github.com/user-attachments/assets/b38c5718-c2f4-4689-b9d8-5e29c971dcb5" />
+
+### Login
+
+<img width="2558" alt="Login" src="https://github.com/user-attachments/assets/9359bb00-706a-41a2-ae34-75af3043d873" />
+
+### Dashboard
+
+<img width="2559" alt="Dashboard" src="https://github.com/user-attachments/assets/d37802a0-6b5c-4931-9d0f-d86730539494" />
+
+### Module Manager (Admin)
+
+<img width="2559" alt="Module Manager" src="https://github.com/user-attachments/assets/c8c3e4fd-5bfe-4709-9468-bd947ba98819" />
+
+### Account Settings
+
+<img width="234" alt="Account Settings" src="https://github.com/user-attachments/assets/635968a7-afb5-4d68-b9a5-75571b7505ea" />
+
+### Avatar Upload
+
+<img width="633" alt="Avatar Upload" src="https://github.com/user-attachments/assets/41da0f54-748b-4d7f-a465-2c13fef427f2" />
+
+### Module Creation
+
+<img width="2559" alt="Module Creation" src="https://github.com/user-attachments/assets/1fbf3602-647e-4f00-a9fe-e057351ac5a9" />
+
+### Module View
+
+<img width="2559" alt="Module View" src="https://github.com/user-attachments/assets/1a057fd2-6009-498d-af81-890bcf94ee48" />
+
+### Learn Page
+
+<img width="2559" alt="Learn" src="https://github.com/user-attachments/assets/6229e978-a53f-4255-a913-c135c758d5d7" />
+
+### Example Pinned Module
+
+<img width="2559" alt="Pinned" src="https://github.com/user-attachments/assets/f677db1b-5e8d-4d58-8b7c-6ebf762bcd55" />
+
+### Mobile Friendly
+
+<img width="961" alt="Mobile" src="https://github.com/user-attachments/assets/c6699163-c8f0-4ace-bb1e-3b4e1fdf733e" />
+
+### Additional Screens
+
+<img width="2559" alt="Modules Example" src="https://github.com/user-attachments/assets/8c645207-84c9-4247-b630-e2b0411287f0" />  
+<img width="2559" alt="Modules Example 2" src="https://github.com/user-attachments/assets/f593372a-3032-4f59-8cc5-985313b748c3" />  
+<img width="2559" alt="Modules Example 3" src="https://github.com/user-attachments/assets/7db89860-e7d7-44db-8ac8-65b2df26cd18" />  
 
