@@ -98,53 +98,19 @@ UPDATE users SET role = 'admin' WHERE username = 'YOURNAMEHERE';
 
 ## 📸 Current State
 
-### Landing Page
-
 <img width="2559" alt="Landing" src="https://github.com/user-attachments/assets/b38c5718-c2f4-4689-b9d8-5e29c971dcb5" />
-
-### Login
-
 <img width="2558" alt="Login" src="https://github.com/user-attachments/assets/9359bb00-706a-41a2-ae34-75af3043d873" />
-
-### Dashboard
-
 <img width="2559" alt="Dashboard" src="https://github.com/user-attachments/assets/d37802a0-6b5c-4931-9d0f-d86730539494" />
-
-### Module Manager (Admin)
-
 <img width="2559" alt="Module Manager" src="https://github.com/user-attachments/assets/c8c3e4fd-5bfe-4709-9468-bd947ba98819" />
-
-### Account Settings
-
 <img width="234" alt="Account Settings" src="https://github.com/user-attachments/assets/635968a7-afb5-4d68-b9a5-75571b7505ea" />
-
-### Avatar Upload
-
 <img width="633" alt="Avatar Upload" src="https://github.com/user-attachments/assets/41da0f54-748b-4d7f-a465-2c13fef427f2" />
-
-### Module Creation
-
 <img width="2559" alt="Module Creation" src="https://github.com/user-attachments/assets/1fbf3602-647e-4f00-a9fe-e057351ac5a9" />
-
-### Module View
-
 <img width="2559" alt="Module View" src="https://github.com/user-attachments/assets/1a057fd2-6009-498d-af81-890bcf94ee48" />
-
-### Learn Page
-
 <img width="2559" alt="Learn" src="https://github.com/user-attachments/assets/6229e978-a53f-4255-a913-c135c758d5d7" />
-
-### Example Pinned Module
-
 <img width="2559" alt="Pinned" src="https://github.com/user-attachments/assets/f677db1b-5e8d-4d58-8b7c-6ebf762bcd55" />
-
-### Mobile Friendly
-
 <img width="961" alt="Mobile" src="https://github.com/user-attachments/assets/c6699163-c8f0-4ace-bb1e-3b4e1fdf733e" />
-
-### Additional Screens
-
 <img width="2559" alt="Modules Example" src="https://github.com/user-attachments/assets/8c645207-84c9-4247-b630-e2b0411287f0" />  
 <img width="2559" alt="Modules Example 2" src="https://github.com/user-attachments/assets/f593372a-3032-4f59-8cc5-985313b748c3" />  
 <img width="2559" alt="Modules Example 3" src="https://github.com/user-attachments/assets/7db89860-e7d7-44db-8ac8-65b2df26cd18" />  
+
 
