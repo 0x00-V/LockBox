@@ -10,6 +10,11 @@ DB_DATABASE=
 ```
 To run the docker container, do: `docker compose up -d`. Then input the tables manually for now.
 
+Gen certs for HTTPS:
+`cd certs`
+`openssl genrsa -out server.key 2048`
+`openssl req -new -x509 -key server.key -out server.cert -days 365`
+
 ## Up to date schemas:
 
 ```
@@ -64,5 +69,6 @@ To turn regular user into admin, use:
 <img width="2558" height="1303" alt="image" src="https://github.com/user-attachments/assets/6cad1ef2-48a6-41ac-a530-7ece6e347863" />
 <img width="346" height="324" alt="image" src="https://github.com/user-attachments/assets/26cb8f9d-d990-4679-b11e-9b11b833cabc" />
 <img width="2559" height="923" alt="image" src="https://github.com/user-attachments/assets/75e645d3-45cc-4815-9f9e-f82ee7ac0ecb" />
+
 
 
