@@ -9,7 +9,7 @@
 
 <body>
     <header>
-        <a href="/"><img src="/Lockbox.png" alt="Lockbox Logo"></img></a>
+        <a href="/"><img src="/Lockbox.png" alt="Lockbox Logo"></a>
         <div class="nav-links">
             <a href="/dashboard">Dashboard</a>
             <div class="user-menu">
@@ -26,16 +26,27 @@
         </div>
     </header>
     <main>
-        <section class="hero">
-            <h1>Module Manager</h1>
-        </section>
-        <h2>Modules</h2>
-        <div class="module-tabs">
-            <button onclick="loadModules('coding')">Coding</button>
-            <button onclick="loadModules('cybersecurity')">Cybersecurity</button>
-            <button class="create_module"><a href="/admin/settings/module_creation">New Module</a></button>
+        <div class="editor-container">
+            <form class="editor-form" id="moduleForm">
+                <label>Module Title</label>
+                <input type="text" id="mdlName" name="name" placeholder="Enter module title" required>
+                <label>Description</label>
+                <textarea id="mdlDesc" name="description" placeholder="Enter module description" required></textarea>
+                <label>Content</label>
+                <textarea id="mdlContent" name="content" placeholder="Module content here..."></textarea>
+                <label>Category</label>
+                <select id="mdlCategory" name="category">
+                    <option value="coding">Coding</option>
+                    <option value="cybersecurity">Cybersecurity</option>
+                </select>
+                <button type="submit" class="publish-btn">Publish</button>
+            </form>
+            <div class="editor-preview">
+                <h2 id="previewTitle">Untitled</h2>
+                <p id="previewDescription">NULL</p>
+                <div id="previewContent"></div>
+            </div>
         </div>
-        <div class="modules-grid" id="modulesGrid"></div>
     </main>
 </body>
 <script>
@@ -49,35 +60,40 @@
             menu.style.display = "none";
         }
     });
-    async function loadModules(category = "") {
-        try {
-            const url = category ? `/api/modules/category/${category}` : "/api/modules/category/";
-            const res = await fetch(url);
-            const modules = await res.json();
-            const grid = document.getElementById("modulesGrid");
-            grid.innerHTML = "";
 
-            modules.forEach(mdl => {
-                const card = document.createElement("div");
-                card.className = "module-card";
-                card.innerHTML = `
-        <img src="${mdl.thumb}" alt="${mdl.name}">
-        <h3>${mdl.name}</h3>
-        <p>${mdl.description}</p>
-        <button class="mdl-btn"><a href="/learning?id=${mdl.id}">View</button>
-        <form method="POST" action="/api/module/${mdl.id}/delete">
-        <button class="mdl-btn" type="submit">Delete</button>
-        </form>
-        `;
-                grid.appendChild(card);
-            });
-        } catch (err) {
-            console.error("Error loading modules", err);
-        }
+    const nameInput = document.getElementById("mdlName");
+    const descInput = document.getElementById("mdlDesc");
+    const contentInput = document.getElementById("mdlContent");
+    const previewTitle = document.getElementById("previewTitle");
+    const previewDesc = document.getElementById("previewDescription");
+    const previewContent = document.getElementById("previewContent");
+
+    function updatePreview() {
+        previewTitle.textContent = nameInput.value || "Untitled Module";
+        previewDesc.textContent = descInput.value || "No description yet...";
+        previewContent.innerHTML = contentInput.value || "";
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        loadModules("coding")
+    [nameInput, descInput, contentInput].forEach(el => {
+        el.addEventListener("input", updatePreview);
+    });
+
+    document.getElementById("moduleForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = {
+            name: document.getElementById("mdlName").value,
+            description: document.getElementById("mdlDesc").value,
+            content: document.getElementById("mdlContent").value,
+            category: document.getElementById("mdlCategory").value,
+        };
+        const res = await fetch("/api/modules/create", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) });
+        const data = await res.json();
+        if (data.success) {
+            alert("Module created");
+            window.location.href = "/admin/settings";
+        } else {
+            alert(data.error || "Failed to create module");
+        }
     });
 </script>
 <style>
@@ -86,11 +102,6 @@
         padding: 0;
         box-sizing: border-box;
         font-family: "Courier New", monospace;
-    }
-
-    a {
-        text-decoration: inherit;
-        color: inherit;
     }
 
     body {
@@ -277,7 +288,6 @@
         transition: border 0.3s;
     }
 
-
     .module-card:hover {
         border-color: #c40d0a;
     }
@@ -323,7 +333,7 @@
         color: #fff;
     }
 
-    .mdl-btn {
+    .pin-btn {
         background: #111;
         color: #aaa;
         border: 1px solid #333;
@@ -331,18 +341,75 @@
         padding: 6px 14px;
         font-size: 14px;
         cursor: pointer;
-        margin: 10px 8px 0 0;
+        margin-top: 10px;
         transition: background 0.3s, color 0.3s, border 0.3s;
     }
 
-    .mdl-btn:hover {
+    .pin-btn:hover {
         background: #c40d0a;
         color: #fff;
         border-color: #c40d0a;
     }
 
-    .mdl-btn:active {
+    .pin-btn:active {
         transform: scale(0.96);
+    }
+
+    .editor-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+
+    .editor-form,
+    .editor-preview {
+        background: #111;
+        border: 1px solid #222;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .editor-form label {
+        display: block;
+        margin: 10px 0 5px;
+        font-weight: bold;
+    }
+
+    .editor-form input,
+    .editor-form textarea,
+    .editor-form select {
+        width: 100%;
+        padding: 10px;
+        background: #0d0d0d;
+        border: 1px solid #333;
+        color: #fff;
+        border-radius: 4px;
+        margin-bottom: 15px;
+    }
+
+    .publish-btn {
+        background: #c40d0a;
+        color: #fff;
+        border: none;
+        padding: 12px 20px;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .publish-btn:hover {
+        background: #a30a08;
+    }
+
+    .editor-preview h2 {
+        color: #c40d0a;
+        margin-bottom: 10px;
+    }
+
+    .editor-preview p {
+        color: #aaa;
+        margin-bottom: 20px;
     }
 </style>
 

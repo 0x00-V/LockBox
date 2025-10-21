@@ -1,336 +1,367 @@
 <!doctype html>
 <html>
+
 <head>
- <title>Lockbox - Dashboard</title>
+    <title>Lockbox - Dashboard</title>
 </head>
+
 <body>
-  <header>
-    <a href="/"><img src="Lockbox.png" alt="Lockbox Logo"></img></a>
-    <div class="nav-links">
-      <a href="/learn">Learn</a>
-      <div class="user-menu">
-          <img src="{{avatar}}" alt="User Icon" class="user-icon" onclick="toggleMenu()">
-        <ul class="dropdown" id="dropdownMenu">
-          <li><a href="/dashboard">Dashboard</a></li>
-          <li>
-            <form action="/logout" method="POST">
-              <button type="submit">Logout</button>
-            </form>
-          </li>
-        </ul>
-      </div>
+    <header>
+        <a href="/"><img src="Lockbox.png" alt="Lockbox Logo"></img></a>
+        <div class="nav-links">
+            <a href="/learn">Learn</a>
+            <div class="user-menu">
+                <img src="{{avatar}}" alt="User Icon" class="user-icon" onclick="toggleMenu()">
+                <ul class="dropdown" id="dropdownMenu">
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li>
+                        <form action="/logout" method="POST">
+                            <button type="submit">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <main>
+        <h1>Settings for {{username}}!</h1>
+        <form id="profileForm" enctype="multipart/form-data" method="POST" action="/api/account/upload-avatar">
+            <label for="profilePicInput">
+                <img src="{{avatar}}" alt="User Icon" class="user-icon" id="profilePicPreview">
+            </label>
+            <input type="file" id="profilePicInput" name="avatar" accept="image/*" style="display:none">
+            <button type="submit">Save</button>
+        </form>
+        <form class="passwordForm" method="POST" action="/api/account/change_password">
+            <label for="old_password">OLD PASSWORD</label>
+            <div class="password-field">
+                <input type="password" name="old_password" placeholder="***********">
+                <button type="button" class="toggle-password">show</button>
+            </div>
+            <label for="new_password_1">NEW PASSWORD</label>
+            <div class="password-field">
+                <input type="password" name="new_password_1" placeholder="***********">
+                <button type="button" class="toggle-password">show</button>
+            </div>
+            <label for="new_password_2">CONFIRM PASSWORD</label>
+            <div class="password-field">
+                <input type="password" name="new_password_2" placeholder="***********">
+                <button type="button" class="toggle-password">show</button>
+            </div>
+            <button type="submit">CHANGE PASSWORD</button>
+        </form>
+    </main>
     </div>
-  </header>
-  <main>
-  <h1>Settings for {{username}}!</h1>
-  <form id="profileForm" enctype="multipart/form-data" method="POST" action="/api/account/upload-avatar">
-  <label for="profilePicInput">
-    <img src="{{avatar}}" alt="User Icon" class="user-icon" id="profilePicPreview">
-  </label>
-  <input type="file" id="profilePicInput" name="avatar" accept="image/*" style="display:none">
-  <button type="submit">Save</button>
-</form>
-<form class="passwordForm" method="POST" action="/api/account/change_password">
-  <label for="old_password">OLD PASSWORD</label>
-  <div class="password-field">
-    <input type="password" name="old_password" placeholder="***********">
-    <button type="button" class="toggle-password">show</button>
-  </div>
-  <label for="new_password_1">NEW PASSWORD</label>
-  <div class="password-field">
-    <input type="password" name="new_password_1" placeholder="***********">
-    <button type="button" class="toggle-password">show</button>
-  </div>
-  <label for="new_password_2">CONFIRM PASSWORD</label>
-  <div class="password-field">
-    <input type="password" name="new_password_2" placeholder="***********">
-    <button type="button" class="toggle-password">show</button>
-  </div>
-  <button type="submit">CHANGE PASSWORD</button>
-</form>
-</main>
-  </div>
-  <script>
-    function toggleMenu() {
-      const menu = document.getElementById("dropdownMenu");
-      menu.style.display = (menu.style.display === "block") ? "none" : "block";
-    }
-    document.addEventListener("click", (e) => {
-      const menu = document.getElementById("dropdownMenu");
-      if (!e.target.closest(".user-menu")) {
-        menu.style.display = "none";
-      }
-    });
-  const fileInput = document.getElementById("profilePicInput");
-  const previewImg = document.getElementById("profilePicPreview");
-  fileInput.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        previewImg.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-  document.getElementById("profileForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    if (fileInput.files[0]) {
-      formData.append("avatar", fileInput.files[0]);
-    }
-    try {
-      const res = await fetch("/api/account/upload-avatar", {
-        method: "POST",
-        body: formData
-      });
-      if (res.ok) {
-        alert("Profile picture updated!");
-      } else {
-        alert("Failed to upload.");
-      }
-    } catch (err) {
-      console.error("Upload error:", err);
-    }
-  });
-  async function getUserRole() {
-      try {
-        const res = await fetch("/api/fetch/userRole");
-        const usr_role = await res.json();
-
-        if (usr_role.role === "admin") {
-          const dm = document.getElementById("dropdownMenu");
-          const li = document.createElement("li");
-          const admin_settings_link = document.createElement("a");
-          admin_settings_link.href = "/admin/settings";
-          admin_settings_link.textContent = "Admin Settings";
-          li.appendChild(admin_settings_link);
-          const logoutLi = dm.querySelector("form")?.closest("li");
-          if (logoutLi) {
-            dm.insertBefore(li, logoutLi);
-          } else {
-            dm.appendChild(li);
-          }
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById("dropdownMenu");
+            menu.style.display = (menu.style.display === "block") ? "none" : "block";
         }
-      } catch (err) {
-        console.error("Error fetching user role:", err);
-      }
-    }
+        document.addEventListener("click", (e) => {
+            const menu = document.getElementById("dropdownMenu");
+            if (!e.target.closest(".user-menu")) {
+                menu.style.display = "none";
+            }
+        });
+        const fileInput = document.getElementById("profilePicInput");
+        const previewImg = document.getElementById("profilePicPreview");
+        fileInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    previewImg.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        document.getElementById("profileForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            if (fileInput.files[0]) {
+                formData.append("avatar", fileInput.files[0]);
+            }
+            try {
+                const res = await fetch("/api/account/upload-avatar", {
+                    method: "POST",
+                    body: formData
+                });
+                if (res.ok) {
+                    alert("Profile picture updated!");
+                } else {
+                    alert("Failed to upload.");
+                }
+            } catch (err) {
+                console.error("Upload error:", err);
+            }
+        });
+        async function getUserRole() {
+            try {
+                const res = await fetch("/api/fetch/userRole");
+                const usr_role = await res.json();
 
-    document.querySelectorAll('.toggle-password').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const input = btn.previousElementSibling;
-    const isHidden = input.type === 'password';
-    input.type = isHidden ? 'text' : 'password';
-    btn.textContent = isHidden ? 'hide' : 'show';
-  });
-});
+                if (usr_role.role === "admin") {
+                    const dm = document.getElementById("dropdownMenu");
+                    const li = document.createElement("li");
+                    const admin_settings_link = document.createElement("a");
+                    admin_settings_link.href = "/admin/settings";
+                    admin_settings_link.textContent = "Admin Settings";
+                    li.appendChild(admin_settings_link);
+                    const logoutLi = dm.querySelector("form")?.closest("li");
+                    if (logoutLi) {
+                        dm.insertBefore(li, logoutLi);
+                    } else {
+                        dm.appendChild(li);
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching user role:", err);
+            }
+        }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      getUserRole();
-    });
-</script>
-  </script>
+        document.querySelectorAll('.toggle-password').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const input = btn.previousElementSibling;
+                const isHidden = input.type === 'password';
+                input.type = isHidden ? 'text' : 'password';
+                btn.textContent = isHidden ? 'hide' : 'show';
+            });
+        });
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Courier New", monospace;
-    }
-    body {
-      background-color: #0d0d0d;
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 40px;
-      background: #111;
-      border-bottom: 2px solid #1f1f1f;
-    }
-    header img {
-      height: 80px;
-    }
-    .nav-links {
-      display: flex;
-      gap: 25px;
-      align-items: center;
-    }
-    .nav-links a {
-      color: #aaa;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 16px;
-      transition: color 0.3s;
-    }
-    .nav-links a:hover {
-      color: #c40d0a;
-    }
-    .user-menu {
-      position: relative;
-    }
-    .user-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid #444;
-      object-fit: cover;
-      transition: border 0.3s;
-    }
-    .user-icon:hover {
-      border: 2px solid #c40d0a;
-    }
-    .dropdown {
-      position: absolute;
-      right: 0;
-      top: 50px;
-      background: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 6px;
-      display: none;
-      list-style: none;
-      padding: 10px 0;
-      min-width: 180px;
-      z-index: 100;
-    }
-    .dropdown li {
-      padding: 10px 20px;
-    }
-    .dropdown li a,
-    .dropdown li button {
-      color: #fff;
-      text-decoration: none;
-      background: none;
-      border: none;
-      cursor: pointer;
-      width: 100%;
-      text-align: left;
-      font-size: 14px;
-    }
-    .dropdown li a:hover,
-    .dropdown li button:hover {
-      background: #c40d0a;
-      color: #fff;
-    }
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 40px;
-    }
-    main h1 {
-      font-size: 2.2rem;
-      margin-bottom: 30px;
-      color: #c40d0a;
-    }
-    #profileForm {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-#profilePicPreview {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: 2px solid #444;
-  cursor: pointer;
-  object-fit: cover;
-  transition: border 0.3s, transform 0.2s;
-}
-#profilePicPreview:hover {
-  border-color: #c40d0a;
-  transform: scale(1.05);
-}
-#profileForm button {
-  background: #111;
-  color: #aaa;
-  border: 1px solid #333;
-  border-radius: 6px;
-  padding: 10px 20px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s, color 0.3s, border 0.3s;
-}
-#profileForm button:hover {
-  background: #c40d0a;
-  color: #fff;
-  border-color: #c40d0a;
-}
-.passwordForm {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-top: 40px;
-  padding: 0 10px;
-  max-width: 400px;
-}
-.passwordForm label {
-  color: #c40d0a;
-  font-weight: bold;
-  letter-spacing: 1px;
-  margin-bottom: 5px;
-}
-.password-field {
-  position: relative;
-  width: 100%;
-}
-.password-field input {
-  width: 100%;
-  background: transparent;
-  color: #fff;
-  border: none;
-  border-bottom: 1px solid #333;
-  padding: 10px 45px 10px 5px;
-  font-family: "Courier New", monospace;
-  font-size: 15px;
-  transition: border-color 0.3s;
-}
-.password-field input:focus {
-  border-color: #c40d0a;
-  outline: none;
-}
-.password-field .toggle-password {
-  position: absolute;
-  right: 5px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #c40d0a;
-  font-size: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  opacity: 0.6;
-  transition: opacity 0.2s, color 0.3s;
-  font-family: "Courier New", monospace;
-}
-.password-field .toggle-password:hover {
-  opacity: 1;
-  color: #ff3c3c;
-}
-.passwordForm button[type="submit"] {
-  background: none;
-  color: #c40d0a;
-  border: 1px solid #c40d0a;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s, color 0.3s;
-  align-self: flex-start;
-}
-.passwordForm button[type="submit"]:hover {
-  background: #c40d0a;
-  color: #fff;
-}
-  </style>
+        document.addEventListener("DOMContentLoaded", () => {
+            getUserRole();
+        });
+    </script>
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Courier New", monospace;
+        }
+
+        body {
+            background-color: #0d0d0d;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: #111;
+            border-bottom: 2px solid #1f1f1f;
+        }
+
+        header img {
+            height: 80px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #aaa;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #c40d0a;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #444;
+            object-fit: cover;
+            transition: border 0.3s;
+        }
+
+        .user-icon:hover {
+            border: 2px solid #c40d0a;
+        }
+
+        .dropdown {
+            position: absolute;
+            right: 0;
+            top: 50px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            display: none;
+            list-style: none;
+            padding: 10px 0;
+            min-width: 180px;
+            z-index: 100;
+        }
+
+        .dropdown li {
+            padding: 10px 20px;
+        }
+
+        .dropdown li a,
+        .dropdown li button {
+            color: #fff;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .dropdown li a:hover,
+        .dropdown li button:hover {
+            background: #c40d0a;
+            color: #fff;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+        }
+
+        main h1 {
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: #c40d0a;
+        }
+
+        #profileForm {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #profilePicPreview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid #444;
+            cursor: pointer;
+            object-fit: cover;
+            transition: border 0.3s, transform 0.2s;
+        }
+
+        #profilePicPreview:hover {
+            border-color: #c40d0a;
+            transform: scale(1.05);
+        }
+
+        #profileForm button {
+            background: #111;
+            color: #aaa;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s, border 0.3s;
+        }
+
+        #profileForm button:hover {
+            background: #c40d0a;
+            color: #fff;
+            border-color: #c40d0a;
+        }
+
+        .passwordForm {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 40px;
+            padding: 0 10px;
+            max-width: 400px;
+        }
+
+        .passwordForm label {
+            color: #c40d0a;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .password-field {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-field input {
+            width: 100%;
+            background: transparent;
+            color: #fff;
+            border: none;
+            border-bottom: 1px solid #333;
+            padding: 10px 45px 10px 5px;
+            font-family: "Courier New", monospace;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .password-field input:focus {
+            border-color: #c40d0a;
+            outline: none;
+        }
+
+        .password-field .toggle-password {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #c40d0a;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s, color 0.3s;
+            font-family: "Courier New", monospace;
+        }
+
+        .password-field .toggle-password:hover {
+            opacity: 1;
+            color: #ff3c3c;
+        }
+
+        .passwordForm button[type="submit"] {
+            background: none;
+            color: #c40d0a;
+            border: 1px solid #c40d0a;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+            align-self: flex-start;
+        }
+
+        .passwordForm button[type="submit"]:hover {
+            background: #c40d0a;
+            color: #fff;
+        }
+    </style>
 </body>
-</html>
 
+</html>
