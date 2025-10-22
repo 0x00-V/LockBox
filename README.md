@@ -96,7 +96,7 @@ UPDATE users SET role = 'admin' WHERE username = 'YOURNAMEHERE';
 
 ---
 
-## 📸 Current State
+## Current State
 
 <img width="2559" alt="Landing" src="https://github.com/user-attachments/assets/b38c5718-c2f4-4689-b9d8-5e29c971dcb5" />
 <img width="2558" alt="Login" src="https://github.com/user-attachments/assets/9359bb00-706a-41a2-ae34-75af3043d873" />
@@ -112,5 +112,6 @@ UPDATE users SET role = 'admin' WHERE username = 'YOURNAMEHERE';
 <img width="2559" alt="Modules Example" src="https://github.com/user-attachments/assets/8c645207-84c9-4247-b630-e2b0411287f0" />  
 <img width="2559" alt="Modules Example 2" src="https://github.com/user-attachments/assets/f593372a-3032-4f59-8cc5-985313b748c3" />  
 <img width="2559" alt="Modules Example 3" src="https://github.com/user-attachments/assets/7db89860-e7d7-44db-8ac8-65b2df26cd18" />  
+
 
 
